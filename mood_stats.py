@@ -4,18 +4,18 @@ from datetime import date
 
 input_file = "mood_tracker_stats\mood_tracker.csv"
 output_file = "mood_tracker_stats\clean_data.csv"
+finput = open(input_file, 'r', encoding='utf-8')
+foutput = open(output_file, 'w', newline='', encoding='utf-8')
+input_content = csv.reader(finput)
+output_content = csv.writer(foutput)
 
-with open(input_file, 'r', encoding='utf-8') as finput, open(output_file, 'w', newline='', encoding='utf-8') as foutput:
-    input_content = csv.reader(finput)
-    output_content = csv.writer(foutput)
-
-    for row in input_content:
-        clean_row = [cell if cell != '' else '0' for cell in row[:14]]  # Replace empty spaces with '0'
-        output_content.writerow(clean_row)
-
+for row in input_content:
+    clean_row = [cell if cell != '' else '0' for cell in row[:14]]
+    output_content.writerow(clean_row)
 
 finput.close()
 foutput.close()
+
 
 coefficients = {'восхитительно': 1, 
                 'супер': 0.95,
@@ -48,12 +48,15 @@ def compound_formula():
     next(data)
     for row_num, row in enumerate(data, start=1):
         if row_num <= 17:
-
             sum_of_moods += int(row[1]) * coefficients[row[0]]
-            print(sum_of_moods)
         else:
             break
 
+    foutput.close()
+
+    satisfaction = round(sum_of_moods/day_of_year * 100)
+
+    return satisfaction
 
 
-compound_formula()
+print(f"Overall satisfaction with life on {date.today()}: {compound_formula()}%")
