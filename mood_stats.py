@@ -1,21 +1,19 @@
 import csv
-from datetime import date, timedelta
+from datetime import date
 
 
 input_file = "mood_tracker_stats\mood_tracker.csv"
 output_file = "mood_tracker_stats\clean_data.csv"
 
-finput = open(input_file, 'r')
-foutput = open(output_file, 'w', newline='')
+with open(input_file, 'r', encoding='utf-8') as finput, open(output_file, 'w', newline='', encoding='utf-8') as foutput:
+    input_content = csv.reader(finput)
+    output_content = csv.writer(foutput)
 
-input_content = csv.reader(finput)
-output_content = csv.writer(foutput)
+    for row in input_content:
+        clean_row = [cell if cell != '' else '0' for cell in row[:14]]  # Replace empty spaces with '0'
+        output_content.writerow(clean_row)
 
-for row in input_content:
-    clean_row = row[:14]
-    output_content.writerow(clean_row)
 
-# output_file = csv.writer(output_content[:-1])
 finput.close()
 foutput.close()
 
@@ -42,8 +40,6 @@ def compound_formula():
     today = date.today()
     day_of_year = today.timetuple().tm_yday
 
-    # moods = []
-
     foutput = open(output_file, 'r', encoding='utf-8')
     data = csv.reader(foutput)
 
@@ -61,4 +57,3 @@ def compound_formula():
 
 
 compound_formula()
-print(coefficients['агрессивно'])
