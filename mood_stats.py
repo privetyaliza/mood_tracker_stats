@@ -1,14 +1,17 @@
 import csv
 
 
-input_file = "mood_tracker.csv"
-output_file = "clean_data.csv"
+input_file = "mood_tracker_stats\mood_tracker.csv"
+output_file = "mood_tracker_stats\clean_data.csv"
 
-with open(input_file, 'r') as finput, open(output_file, 'w', newline='') as foutput:
-    input_content = csv.reader(finput)
-    output_content = csv.writer(foutput)
-    useless_content = '"'
-    for row in input_content:
-        print(row)
-        clean_row = row[:14]
-        output_content.writerow(clean_row)
+finput = open(input_file, 'r')
+foutput = open(output_file, 'w', newline='')
+
+input_content = csv.reader(finput)
+output_content = csv.writer(foutput)
+
+for row in input_content:
+    clean_row = row[:14]
+    output_content.writerow(clean_row)
+
+finput.close()
