@@ -45,65 +45,44 @@ def formula(period):
 
     if period == 'year':
         row_of_period = 1
+    elif period == 'month':
+        row_of_period = input('Enter the number of the month you want to proceed with. For current month, press Enter:')
+        if row_of_period == '':
+            row_of_period = datetime.now().month + 1
+        else:
+            row_of_period = int(row_of_period) + 1
+    # else:
+    #     return 'Incorrect input'
 
     next(data)
     for row_num, row in enumerate(data, start=1):
         if row_num <= 17:
             sum_of_moods += int(row[row_of_period]) * coefficients[row[0]]
-        else:
-            break
-
-    foutput.close()
-
-    return sum_of_moods
-
-
-def year_formula():
-    today = date.today()
-    day_of_year = today.timetuple().tm_yday
-
-    # foutput = open(output_file, 'r', encoding='utf-8')
-    # data = csv.reader(foutput)
-
-    # sum_of_moods = 0
-
-    # next(data)
-    # for row_num, row in enumerate(data, start=1):
-    #     if row_num <= 17:
-    #         sum_of_moods += int(row[1]) * coefficients[row[0]]
-    #     else:
-    #         break
-
-    # foutput.close()
-    sum_of_moods = formula('year')
-
-    satisfaction = round(sum_of_moods/day_of_year * 100)
-
-    return satisfaction
-
-
-def monthly_formula():
-    month = input('Enter the number of the month you want to proceed with. For current month, press Enter:')
-    if month == '':
-        month = datetime.now().month
-    else:
-        month = int(month)
-    
-    foutput = open(output_file, 'r', encoding='utf-8')
-    data = csv.reader(foutput)
-
-    sum_of_moods = 0
-
-    next(data)
-    for row_num, row in enumerate(data, start=1):
-        if row_num <= 17:
-            sum_of_moods += int(row[month+1]) * coefficients[row[0]]
             print(sum_of_moods)
         else:
             break
 
     foutput.close()
 
+    return sum_of_moods, row_of_period
 
-print(f"Overall satisfaction with life on {date.today()}: {year_formula()}%")
-# monthly_formula()
+
+def year_formula():
+    today = date.today()
+    day_of_year = today.timetuple().tm_yday
+
+    sum_of_moods, _ = formula('year')
+    satisfaction = round(sum_of_moods/day_of_year * 100)
+
+    return satisfaction
+
+
+def monthly_formula():
+    sum_of_moods, days_in_month = formula('month')
+    satisfaction = round(sum_of_moods/days_in_month)
+
+    return satisfaction
+
+
+#print(f"Overall satisfaction with life on {date.today()}: {year_formula()}%")
+print(monthly_formula())
