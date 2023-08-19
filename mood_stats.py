@@ -42,24 +42,42 @@ def formula(period):
     data = csv.reader(foutput)
 
     sum_of_moods = 0
-    row_of_period = 0
+    col_of_period = 0
+    monthly_sums = {month: 0 for month in calendar.month_name[1:]}
 
     if period == 'year':
-        row_of_period = 1
+        col_of_period = 1
         days_in_month = 0
+
     elif period == 'month':
-        row_of_period = input('Enter the number of the month you want to proceed with. For current month, press Enter:')
-        if row_of_period == '':
-            row_of_period = datetime.now().month + 1
+        col_of_period = input('Enter the number of the month you want to proceed with. For current month, press Enter:')
+        if col_of_period == '':
+            col_of_period = datetime.now().month + 1
             days_in_month = datetime.now().day
         else:
-            row_of_period = int(row_of_period) + 1
-            days_in_month = calendar.monthrange(datetime.now().year, row_of_period-1)[1]
+            col_of_period = int(col_of_period) + 1
+            days_in_month = calendar.monthrange(datetime.now().year, col_of_period-1)[1]
 
+    elif period == 'all_months':
+        next(data)
+
+        for row in data:
+            if row[0] == '-':
+                break
+            for month_num, value in enumerate(row[2:], start=1):
+                month_name = calendar.month_name[month_num]
+                monthly_sums[month_name] += int(value) * coefficients[row[0]]
+
+        for month, total_sum in monthly_sums.items():
+            monthly_sums[month] = total_sum
+
+        return monthly_sums
+    
+    foutput.seek(0)
     next(data)
     for row_num, row in enumerate(data, start=1):
         if row_num <= 17:
-            sum_of_moods += int(row[row_of_period]) * coefficients[row[0]]
+            sum_of_moods += int(row[col_of_period]) * coefficients[row[0]]
         else:
             break
 
@@ -85,6 +103,18 @@ def monthly_formula():
     return satisfaction
 
 
+def all_months():
+    months = formula('all_months')
+    for month, total_sum in months.items():
+        days_in_month = calendar.monthrange(datetime.now().year, list(calendar.month_name).index(month))[1]
+        months[month] = total_sum / days_in_month * 100
+    
+    for key, value in months.items():
+        print(f'{key}: {round(value)}%')
+    return
+        
+
+
 def main():
     while True:
         choice = input('Enter "y" if you want to see results for the whole year, "m" if you want to see it for some month, and q for quitting:')
@@ -92,6 +122,8 @@ def main():
             print(f"Overall satisfaction with life on {date.today()}: {year_formula()}%")
         elif choice == 'm':
             print(f"Overall satisfaction with life on the given month: {monthly_formula()}%")
+        elif choice == 'am':
+            all_months()
         elif choice == 'q':
             return 0
 
