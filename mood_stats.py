@@ -1,5 +1,5 @@
 import csv
-from datetime import date
+from datetime import date, datetime
 
 
 input_file = "mood_tracker_stats\mood_tracker.csv"
@@ -36,10 +36,59 @@ coefficients = {'восхитительно': 1,
                 'отвратительно': 0}
 
 
-def compound_formula():
+def formula(period):
+    foutput = open(output_file, 'r', encoding='utf-8')
+    data = csv.reader(foutput)
+
+    sum_of_moods = 0
+    row_of_period = 0
+
+    if period == 'year':
+        row_of_period = 1
+
+    next(data)
+    for row_num, row in enumerate(data, start=1):
+        if row_num <= 17:
+            sum_of_moods += int(row[row_of_period]) * coefficients[row[0]]
+        else:
+            break
+
+    foutput.close()
+
+    return sum_of_moods
+
+
+def year_formula():
     today = date.today()
     day_of_year = today.timetuple().tm_yday
 
+    # foutput = open(output_file, 'r', encoding='utf-8')
+    # data = csv.reader(foutput)
+
+    # sum_of_moods = 0
+
+    # next(data)
+    # for row_num, row in enumerate(data, start=1):
+    #     if row_num <= 17:
+    #         sum_of_moods += int(row[1]) * coefficients[row[0]]
+    #     else:
+    #         break
+
+    # foutput.close()
+    sum_of_moods = formula('year')
+
+    satisfaction = round(sum_of_moods/day_of_year * 100)
+
+    return satisfaction
+
+
+def monthly_formula():
+    month = input('Enter the number of the month you want to proceed with. For current month, press Enter:')
+    if month == '':
+        month = datetime.now().month
+    else:
+        month = int(month)
+    
     foutput = open(output_file, 'r', encoding='utf-8')
     data = csv.reader(foutput)
 
@@ -48,15 +97,13 @@ def compound_formula():
     next(data)
     for row_num, row in enumerate(data, start=1):
         if row_num <= 17:
-            sum_of_moods += int(row[1]) * coefficients[row[0]]
+            sum_of_moods += int(row[month+1]) * coefficients[row[0]]
+            print(sum_of_moods)
         else:
             break
 
     foutput.close()
 
-    satisfaction = round(sum_of_moods/day_of_year * 100)
 
-    return satisfaction
-
-
-print(f"Overall satisfaction with life on {date.today()}: {compound_formula()}%")
+print(f"Overall satisfaction with life on {date.today()}: {year_formula()}%")
+# monthly_formula()
