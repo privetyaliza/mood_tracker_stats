@@ -1,5 +1,6 @@
 import csv
 from datetime import date, datetime
+import calendar
 
 
 input_file = "mood_tracker_stats\mood_tracker.csv"
@@ -45,26 +46,26 @@ def formula(period):
 
     if period == 'year':
         row_of_period = 1
+        days_in_month = 0
     elif period == 'month':
         row_of_period = input('Enter the number of the month you want to proceed with. For current month, press Enter:')
         if row_of_period == '':
             row_of_period = datetime.now().month + 1
+            days_in_month = datetime.now().day
         else:
             row_of_period = int(row_of_period) + 1
-    # else:
-    #     return 'Incorrect input'
+            days_in_month = calendar.monthrange(datetime.now().year, row_of_period-1)[1]
 
     next(data)
     for row_num, row in enumerate(data, start=1):
         if row_num <= 17:
             sum_of_moods += int(row[row_of_period]) * coefficients[row[0]]
-            print(sum_of_moods)
         else:
             break
 
     foutput.close()
 
-    return sum_of_moods, row_of_period
+    return sum_of_moods, days_in_month
 
 
 def year_formula():
@@ -79,10 +80,21 @@ def year_formula():
 
 def monthly_formula():
     sum_of_moods, days_in_month = formula('month')
-    satisfaction = round(sum_of_moods/days_in_month)
+    satisfaction = round(sum_of_moods/days_in_month * 100)
 
     return satisfaction
 
 
-#print(f"Overall satisfaction with life on {date.today()}: {year_formula()}%")
-print(monthly_formula())
+def main():
+    while True:
+        choice = input('Enter "y" if you want to see results for the whole year, "m" if you want to see it for some month, and q for quitting:')
+        if choice == 'y':
+            print(f"Overall satisfaction with life on {date.today()}: {year_formula()}%")
+        elif choice == 'm':
+            print(f"Overall satisfaction with life on the given month: {monthly_formula()}%")
+        elif choice == 'q':
+            return 0
+
+
+if __name__ == "__main__":
+    main()
